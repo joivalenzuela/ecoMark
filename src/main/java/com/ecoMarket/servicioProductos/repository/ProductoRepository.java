@@ -11,10 +11,10 @@ import java.util.List;
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto,Long> {
 
-    @Query( "SELECT p FROM producto p WHERE " +
+    @Query("SELECT p FROM Producto p WHERE " +
             "(:categoria IS NULL OR p.categoria = :categoria) AND " +
             "(:marca IS NULL OR p.marca = :marca)")
-    List<Producto> findByFilter(
+    List<Producto> buscarPorFiltro(
             @Param("categoria") String categoria,
             @Param("marca") String marca);
 

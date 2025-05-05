@@ -18,8 +18,8 @@ public class ProductoController {
 
     @GetMapping()
     public ResponseEntity<List<Producto>> listar(
-            @PathVariable(required = false) String categoria,
-            @PathVariable(required = false) String marca) {
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) String marca) {
 
         List<Producto> productos;
 
@@ -27,7 +27,7 @@ public class ProductoController {
             productos = productoService.findAll();
         }
         else {
-            productos = productoService.findByFilter(categoria,marca);
+            productos = productoService.buscarPorFiltro(categoria,marca);
         }
 
         if (productos.isEmpty()) {

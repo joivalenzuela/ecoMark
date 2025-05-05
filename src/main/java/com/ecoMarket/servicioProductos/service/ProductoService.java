@@ -19,8 +19,8 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
-    public List<Producto> findByFilter(String categoria,String marca){
-        return productoRepository.findByFilter(categoria,marca);
+    public List<Producto> buscarPorFiltro(String categoria,String marca){
+        return productoRepository.buscarPorFiltro(categoria,marca);
     }
 
     public Producto findById(long id) {
