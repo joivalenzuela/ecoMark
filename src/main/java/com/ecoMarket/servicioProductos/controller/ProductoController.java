@@ -23,6 +23,9 @@ public class ProductoController {
 
         List<Producto> productos;
 
+        categoria = "".equals(categoria) ? null : categoria;
+        marca = "".equals(marca) ? null : marca;
+
         if(categoria == null && marca == null){
             productos = productoService.findAll();
         }
