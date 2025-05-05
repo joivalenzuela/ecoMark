@@ -28,7 +28,7 @@ public class ProductoService {
     }
 
     public List<Producto> findByCategoria(String categoria) {
-        return productoRepository.findByMarca(categoria);
+        return productoRepository.findByCategoria(categoria);
     }
 
     public Producto findByProdCode(String prodCode) {
