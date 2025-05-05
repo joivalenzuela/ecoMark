@@ -16,8 +16,14 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column (unique = true, nullable = false)
+    private String prodCode;
+
     @Column(nullable = false)
     private String nombre;
+
+    @Column(nullable = false)
+    private String marca;
 
     @Column(nullable = false)
     private Integer precio;

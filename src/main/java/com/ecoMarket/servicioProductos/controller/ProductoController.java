@@ -25,6 +25,25 @@ public class ProductoController {
         return ResponseEntity.ok(productos);
     }
 
+
+    @GetMapping("/categoria/{categoria}")
+    public ResponseEntity<List<Producto>> listarCategoria(@PathVariable String categoria) {
+        List<Producto> productos = productoService.findByCategoria(categoria);
+        if (productos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(productos);
+    }
+
+    @GetMapping("/marca/{marca}")
+    public ResponseEntity<List<Producto>> listarMarca(@PathVariable String marca) {
+        List<Producto> productos = productoService.findByMarca(marca);
+        if (productos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(productos);
+    }
+
     @PostMapping
     public ResponseEntity<Producto> guardar(@RequestBody Producto producto) {
         Producto productoNuevo = productoService.save(producto);
@@ -35,6 +54,16 @@ public class ProductoController {
     public ResponseEntity<Producto> buscar(@PathVariable Integer id) {
         try {
             Producto producto = productoService.findById(id);
+            return ResponseEntity.ok(producto);
+        } catch ( Exception e ) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/codigo/{prodCode}")
+    public ResponseEntity<Producto> buscarCodigo(@PathVariable String prodCode) {
+        try {
+            Producto producto = productoService.findByProdCode(prodCode);
             return ResponseEntity.ok(producto);
         } catch ( Exception e ) {
             return ResponseEntity.notFound().build();

@@ -23,12 +23,28 @@ public class ProductoService {
         return productoRepository.findById(id).get();
     }
 
+    public List<Producto> findByMarca(String marca) {
+        return productoRepository.findByMarca(marca);
+    }
+
+    public List<Producto> findByCategoria(String categoria) {
+        return productoRepository.findByMarca(categoria);
+    }
+
+    public Producto findByProdCode(String prodCode) {
+        return productoRepository.findByProdCode(prodCode);
+    }
+
     public Producto save(Producto producto) {
         return productoRepository.save(producto);
     }
 
     public void delete(Long id) {
         productoRepository.deleteById(id);
+
     }
+
+
+
 
 }
