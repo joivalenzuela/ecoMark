@@ -19,16 +19,12 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
+    public List<Producto> findByFilter(String categoria,String marca){
+        return productoRepository.findByFilter(categoria,marca);
+    }
+
     public Producto findById(long id) {
         return productoRepository.findById(id).get();
-    }
-
-    public List<Producto> findByMarca(String marca) {
-        return productoRepository.findByMarca(marca);
-    }
-
-    public List<Producto> findByCategoria(String categoria) {
-        return productoRepository.findByCategoria(categoria);
     }
 
     public Producto findByProdCode(String prodCode) {
@@ -42,6 +38,10 @@ public class ProductoService {
     public void delete(Long id) {
         productoRepository.deleteById(id);
 
+    }
+
+    public void deleteByProdCode(String prodCode) {
+        productoRepository.deleteByProdCode(prodCode);
     }
 
 

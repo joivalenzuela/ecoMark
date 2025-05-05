@@ -16,42 +16,28 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
-    @GetMapping
-    public ResponseEntity<List<Producto>> listar() {
-        List<Producto> productos = productoService.findAll();
+    @GetMapping()
+    public ResponseEntity<List<Producto>> listar(
+            @PathVariable(required = false) String categoria,
+            @PathVariable(required = false) String marca) {
+
+        List<Producto> productos;
+
+        if(categoria == null && marca == null){
+            productos = productoService.findAll();
+        }
+        else {
+            productos = productoService.findByFilter(categoria,marca);
+        }
+
         if (productos.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(productos);
-    }
-
-
-    @GetMapping("/categoria/{categoria}")
-    public ResponseEntity<List<Producto>> listarCategoria(@PathVariable String categoria) {
-        List<Producto> productos = productoService.findByCategoria(categoria);
-        if (productos.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(productos);
-    }
-
-    @GetMapping("/marca/{marca}")
-    public ResponseEntity<List<Producto>> listarMarca(@PathVariable String marca) {
-        List<Producto> productos = productoService.findByMarca(marca);
-        if (productos.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(productos);
-    }
-
-    @PostMapping
-    public ResponseEntity<Producto> guardar(@RequestBody Producto producto) {
-        Producto productoNuevo = productoService.save(producto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(productoNuevo);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> buscar(@PathVariable Integer id) {
+    public ResponseEntity<Producto> buscarPorId(@PathVariable Integer id) {
         try {
             Producto producto = productoService.findById(id);
             return ResponseEntity.ok(producto);
@@ -61,7 +47,7 @@ public class ProductoController {
     }
 
     @GetMapping("/codigo/{prodCode}")
-    public ResponseEntity<Producto> buscarCodigo(@PathVariable String prodCode) {
+    public ResponseEntity<Producto> buscarPorCodigo(@PathVariable String prodCode) {
         try {
             Producto producto = productoService.findByProdCode(prodCode);
             return ResponseEntity.ok(producto);
@@ -70,8 +56,16 @@ public class ProductoController {
         }
     }
 
+    @PostMapping
+    public ResponseEntity<Producto> guardar(@RequestBody Producto producto) {
+        Producto productoNuevo = productoService.save(producto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productoNuevo);
+    }
+
     @PutMapping
-    public ResponseEntity<Producto> actualizar(@PathVariable Integer id, @RequestBody Producto producto) {
+    public ResponseEntity<Producto> actualizar(
+            @PathVariable Integer id,
+            @RequestBody Producto producto) {
         try {
             Producto pro = productoService.findById(id);
             pro.setId(producto.getId());
@@ -92,6 +86,16 @@ public class ProductoController {
     public ResponseEntity<?> eliminar(@PathVariable long id) {
         try {
             productoService.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch ( Exception e ) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/codigo/{prodCode}")
+    public ResponseEntity<?> eliminarPorCodigo(@PathVariable String prodCode){
+        try {
+            productoService.deleteByProdCode(prodCode);
             return ResponseEntity.noContent().build();
         } catch ( Exception e ) {
             return ResponseEntity.notFound().build();
