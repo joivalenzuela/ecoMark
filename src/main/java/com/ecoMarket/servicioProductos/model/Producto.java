@@ -28,9 +28,6 @@ public class Producto {
     @Column(nullable = false)
     private Integer precio;
 
-    @Column(nullable = false)
-    private Integer stock;
-
     @Column(nullable = true)
     private String categoria;
 
