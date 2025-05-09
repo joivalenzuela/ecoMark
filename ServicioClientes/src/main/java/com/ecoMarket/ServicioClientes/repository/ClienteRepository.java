@@ -1,4 +1,10 @@
 package com.ecoMarket.ServicioClientes.repository;
 
-public interface ClienteRepository {
+import com.ecoMarket.ServicioClientes.model.Cliente;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ClienteRepository extends JpaRepository<Cliente, Long> {
+
 }
