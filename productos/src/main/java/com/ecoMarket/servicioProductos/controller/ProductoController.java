@@ -76,6 +76,7 @@ public class ProductoController {
             pro.setNombre(producto.getNombre());
             pro.setEsEco(producto.getEsEco());
             pro.setPrecio(producto.getPrecio());
+            pro.setStock(producto.getStock());
 
             productoService.save(pro);
             return ResponseEntity.ok(producto);

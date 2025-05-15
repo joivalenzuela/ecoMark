@@ -34,4 +34,6 @@ public class Producto {
     @Column(nullable = false)
     private Boolean esEco;
 
+    @Column(nullable = false)
+    private int stock;
 }
