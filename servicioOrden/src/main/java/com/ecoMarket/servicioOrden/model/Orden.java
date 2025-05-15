@@ -16,7 +16,7 @@ import java.util.Date;
 public class Orden {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(nullable= false)
     private Date fecha;
