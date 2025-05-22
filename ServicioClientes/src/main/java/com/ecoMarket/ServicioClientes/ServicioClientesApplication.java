@@ -1,13 +1,13 @@
-package com.ecoMarket.servicioInventario;
+package com.ecoMarket.ServicioClientes;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ServicioInventarioApplication {
+public class ServicioClientesApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ServicioInventarioApplication.class, args);
+		SpringApplication.run(ServicioClientesApplication.class, args);
 	}
 
 }
