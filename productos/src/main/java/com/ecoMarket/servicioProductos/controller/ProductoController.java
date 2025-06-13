@@ -31,7 +31,8 @@ public class ProductoController {
     @Operation(summary = "Obtener todos los productos",
             description = "Obtiene una lista de todos los productos, con posibilidad de filtrar por categoria y/o marca")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Productos listados exitosamente",
+            @ApiResponse(responseCode = "200",
+                    description = "Productos listados exitosamente",
                     content = @Content(mediaType = "application/json",
                             array = @ArraySchema
                                     (schema = @Schema(implementation = Producto.class)),
@@ -82,8 +83,8 @@ public class ProductoController {
                     example = "Watts",
                     schema = @Schema(type = "String")
             )
-            @RequestParam(required = false) String marca)
-    {
+            @RequestParam(required = false) String marca
+    ){
         List<Producto> productos;
 
         categoria = "".equals(categoria) ? null : categoria;
@@ -103,7 +104,43 @@ public class ProductoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> buscarPorId(@PathVariable Integer id) {
+    @Operation(summary = "Buscar un producto por id",
+            description = "Obtiene el producto cuya id sea equivalente a la ingresada parametricamente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+            description = "Producto encontrado",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = Producto.class),
+                    examples = @ExampleObject(
+                            name = "Producto de Ejemplo",
+                            description = "Resultado de ejemplo de la operacion, con id = 1",
+                            value = """
+                                    {
+                                        "id": 1,
+                                        "prodCode": 1,
+                                        "nombre": "Hamburguesa Vacuno 100g",
+                                        "marca": "PF",
+                                        "precio": 750,
+                                        "categoria": "hamburguesas",
+                                        "esEco": false,
+                                        "stock": 134
+                                    }
+                                    """
+                    ))),
+            @ApiResponse(responseCode = "404",
+                    description = "No se encontro el Producto",
+                    content = @Content(schema = @Schema(hidden = true)))
+    })
+    public ResponseEntity<Producto> buscarPorId(
+            @Parameter(
+                    name = "Id",
+                    description = "Valor de la id del producto a buscar",
+                    required = true,
+                    example = "23",
+                    schema = @Schema(type = "int")
+            )
+            @PathVariable Integer id
+    ){
         try {
             Producto producto = productoService.findById(id);
             return ResponseEntity.ok(producto);
@@ -113,7 +150,43 @@ public class ProductoController {
     }
 
     @GetMapping("/codigo/{prodCode}")
-    public ResponseEntity<Producto> buscarPorCodigo(@PathVariable String prodCode) {
+    @Operation(summary = "Buscar un producto por su codigo",
+            description = "Obtiene el producto cuyo codigo sea equivalente al ingresado parametricamente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Producto encontrado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Producto.class),
+                            examples = @ExampleObject(
+                                    name = "Producto de Ejemplo",
+                                    description = "Resultado de ejemplo de la operacion, con codigo = 1",
+                                    value = """
+                                    {
+                                        "id": 1,
+                                        "prodCode": 1,
+                                        "nombre": "Hamburguesa Vacuno 100g",
+                                        "marca": "PF",
+                                        "precio": 750,
+                                        "categoria": "hamburguesas",
+                                        "esEco": false,
+                                        "stock": 134
+                                    }
+                                    """
+                            ))),
+            @ApiResponse(responseCode = "404",
+                    description = "No se encontro el Producto",
+                    content = @Content(schema = @Schema(hidden = true)))
+    })
+    public ResponseEntity<Producto> buscarPorCodigo(
+            @Parameter(
+                    name = "prodCode",
+                    description = "Valor del codigo del producto a buscar",
+                    required = true,
+                    example = "43",
+                    schema = @Schema(type = "String")
+            )
+            @PathVariable String prodCode
+    ){
         try {
             Producto producto = productoService.findByProdCode(prodCode);
             return ResponseEntity.ok(producto);
@@ -122,7 +195,17 @@ public class ProductoController {
         }
     }
 
+
     @PostMapping
+    @Operation(summary = "Agregar un nuevo Producto",
+            description = "Agrega un nuevo producto segun los datos ingresados")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201",
+                    description = "Producto agregado exitosamente")
+
+
+
+    })
     public ResponseEntity<Producto> guardar(@RequestBody Producto producto) {
         Producto productoNuevo = productoService.save(producto);
         return ResponseEntity.status(HttpStatus.CREATED).body(productoNuevo);
