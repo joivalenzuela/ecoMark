@@ -26,7 +26,6 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
-
     @GetMapping()
     @Operation(summary = "Obtener todos los productos",
             description = "Obtiene una lista de todos los productos, con posibilidad de filtrar por categoria y/o marca")
@@ -63,9 +62,11 @@ public class ProductoController {
                                                 }
                                             ]
                                             """
-                            ))),
+                            ))
+            ),
             @ApiResponse(responseCode = "204", description = "No se encontraron Productos",
-                    content = @Content(schema = @Schema(hidden = true)))
+                    content = @Content(schema = @Schema(hidden = true))
+            )
     })
     public ResponseEntity<List<Producto>> listar(
             @Parameter(
@@ -126,10 +127,12 @@ public class ProductoController {
                                         "stock": 134
                                     }
                                     """
-                    ))),
+                    ))
+            ),
             @ApiResponse(responseCode = "404",
                     description = "No se encontro el Producto",
-                    content = @Content(schema = @Schema(hidden = true)))
+                    content = @Content(schema = @Schema(hidden = true))
+            )
     })
     public ResponseEntity<Producto> buscarPorId(
             @Parameter(
@@ -172,10 +175,12 @@ public class ProductoController {
                                         "stock": 134
                                     }
                                     """
-                            ))),
+                            ))
+            ),
             @ApiResponse(responseCode = "404",
                     description = "No se encontro el Producto",
-                    content = @Content(schema = @Schema(hidden = true)))
+                    content = @Content(schema = @Schema(hidden = true))
+            )
     })
     public ResponseEntity<Producto> buscarPorCodigo(
             @Parameter(
@@ -197,24 +202,59 @@ public class ProductoController {
 
 
     @PostMapping
-    @Operation(summary = "Agregar un nuevo Producto",
+    @Operation(summary = "Agregar un Producto",
             description = "Agrega un nuevo producto segun los datos ingresados")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201",
-                    description = "Producto agregado exitosamente")
-
-
-
+                    description = "Producto agregado exitosamente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Producto.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Ocurrio un error en la ejecucion de la operacion," +
+                    " posible error en la sintanxis",
+                    content = @Content(schema = @Schema(hidden = true))
+            )
     })
-    public ResponseEntity<Producto> guardar(@RequestBody Producto producto) {
+    public ResponseEntity<Producto> guardar(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Producto a crear",
+                    required = true
+            )
+            @RequestBody Producto producto
+    ){
         Producto productoNuevo = productoService.save(producto);
         return ResponseEntity.status(HttpStatus.CREATED).body(productoNuevo);
     }
 
     @PutMapping
+    @Operation(summary = "Modificar un producto",
+            description = "Altera las propiedades del producto rescatado segun la id dada")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201",
+                    description = "Producto Actualizado exitosamente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Producto.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Ocurrio un error en la ejecucion de la operacion," +
+                    " posible error en la sintanxis",
+                    content = @Content(schema = @Schema(hidden = true))
+            )
+    })
     public ResponseEntity<Producto> actualizar(
+            @Parameter(
+                    name = "Id",
+                    description = "Valor de la id del producto a actualizar",
+                    required = true,
+                    example = "23",
+                    schema = @Schema(type = "int")
+            )
             @PathVariable Integer id,
-            @RequestBody Producto producto) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Producto ya modificado",
+                    required = true
+            )
+            @RequestBody Producto producto
+    ){
         try {
             Producto pro = productoService.findById(id);
             pro.setId(producto.getId());
@@ -232,7 +272,28 @@ public class ProductoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminar(@PathVariable long id) {
+    @Operation(summary = "Eliminar un producto por id",
+            description = "Elimina el producto seleccionado segun la id dada")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204",
+                    description = "Producto eliminado exitosamente",
+                    content = @Content(schema = @Schema(hidden = true))
+            ),
+            @ApiResponse(responseCode = "404",
+                    description = "No se encontro el Producto",
+                    content = @Content(schema = @Schema(hidden = true))
+            )
+    })
+    public ResponseEntity<?> eliminar(
+            @Parameter(
+                    name = "Id",
+                    description = "Valor de la id del producto a eliminar",
+                    required = true,
+                    example = "23",
+                    schema = @Schema(type = "int")
+            )
+            @PathVariable long id
+    ){
         try {
             productoService.delete(id);
             return ResponseEntity.noContent().build();
@@ -242,7 +303,28 @@ public class ProductoController {
     }
 
     @DeleteMapping("/codigo/{prodCode}")
-    public ResponseEntity<?> eliminarPorCodigo(@PathVariable String prodCode){
+    @Operation(summary = "Eliminar un producto por codigo",
+            description = "Elimina el producto seleccionado segun el codigo dado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204",
+                    description = "Producto eliminado exitosamente",
+                    content = @Content(schema = @Schema(hidden = true))
+            ),
+            @ApiResponse(responseCode = "404",
+                    description = "No se encontro el Producto",
+                    content = @Content(schema = @Schema(hidden = true))
+            )
+    })
+    public ResponseEntity<?> eliminarPorCodigo(
+            @Parameter(
+                    name = "prodCode",
+                    description = "Valor del codigo del producto a eliminar",
+                    required = true,
+                    example = "43",
+                    schema = @Schema(type = "String")
+            )
+            @PathVariable String prodCode
+    ){
         try {
             productoService.deleteByProdCode(prodCode);
             return ResponseEntity.noContent().build();
