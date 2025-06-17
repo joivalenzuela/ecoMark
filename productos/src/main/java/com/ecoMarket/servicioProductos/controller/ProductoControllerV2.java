@@ -1,5 +1,6 @@
 package com.ecoMarket.servicioProductos.controller;
 
+import com.ecoMarket.servicioProductos.assemblers.ProductoModelAssembler;
 import com.ecoMarket.servicioProductos.model.Producto;
 import com.ecoMarket.servicioProductos.service.ProductoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,21 +13,31 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.hateoas.CollectionModel;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/api/v1/productos")
-@Tag(name="Productos", description = "Operaciones relacionadas con los productos")
-public class ProductoController {
+@RequestMapping("/api/v2/productos")
+@Tag(name="Productos V2", description = "Operaciones relacionadas con los productos")
+public class ProductoControllerV2 {
 
     @Autowired
     private ProductoService productoService;
 
-    @GetMapping()
+    @Autowired
+    private ProductoModelAssembler assembler;
+
+    @GetMapping(MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Obtener todos los productos",
             description = "Obtiene una lista de todos los productos, con posibilidad de filtrar por categoria y/o marca")
     @ApiResponses(value = {
@@ -68,13 +79,13 @@ public class ProductoController {
                     content = @Content(schema = @Schema(hidden = true))
             )
     })
-    public ResponseEntity<List<Producto>> listar(
+    public CollectionModel<EntityModel<Producto>> listar(
             @Parameter(
                     name = "Categoria",
                     description = "Categoria del producto",
                     required = false,
                     schema = @Schema(type = "String")
-                    )
+            )
             @RequestParam(required = false) String categoria,
             @Parameter(
                     name = "Marca" ,
@@ -84,22 +95,23 @@ public class ProductoController {
             )
             @RequestParam(required = false) String marca
     ){
-        List<Producto> productos;
+        List<EntityModel<Producto>> productos;
 
         categoria = "".equals(categoria) ? null : categoria;
         marca = "".equals(marca) ? null : marca;
 
         if(categoria == null && marca == null){
-            productos = productoService.findAll();
+            productos = productoService.findAll().stream()
+                    .map(assembler::toModel).collect(Collectors.toList());
+            return CollectionModel.of(productos,
+                    linkTo(methodOn(ProductoControllerV2.class).listar(categoria,marca)).withSelfRel());
         }
         else {
-            productos = productoService.buscarPorFiltro(categoria,marca);
+            productos = productoService.buscarPorFiltro(categoria,marca).stream()
+                    .map(assembler::toModel).collect(Collectors.toList());
+            return CollectionModel.of(productos,
+                    linkTo(methodOn(ProductoControllerV2.class).listar(categoria, marca)).withSelfRel());
         }
-
-        if (productos.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(productos);
     }
 
     @GetMapping("/{id}")
@@ -107,13 +119,13 @@ public class ProductoController {
             description = "Obtiene el producto cuya id sea equivalente a la ingresada parametricamente")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
-            description = "Producto encontrado",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = Producto.class),
-                    examples = @ExampleObject(
-                            name = "Producto de Ejemplo",
-                            description = "Resultado de ejemplo de la operacion, con id = 1",
-                            value = """
+                    description = "Producto encontrado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Producto.class),
+                            examples = @ExampleObject(
+                                    name = "Producto de Ejemplo",
+                                    description = "Resultado de ejemplo de la operacion, con id = 1",
+                                    value = """
                                     {
                                         "id": 1,
                                         "prodCode": 1,
@@ -125,7 +137,7 @@ public class ProductoController {
                                         "stock": 134
                                     }
                                     """
-                    ))
+                            ))
             ),
             @ApiResponse(responseCode = "404",
                     description = "No se encontro el Producto",
