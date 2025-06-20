@@ -3,7 +3,14 @@ package com.ecoMarket.servicioOrden.controller;
 
 import com.ecoMarket.servicioOrden.model.Orden;
 import com.ecoMarket.servicioOrden.service.OrdenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +20,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/ordenes")
+@Tag(name = "Ordenes",description = "Operaciones relacionadas con las ordenes.")
 public class OrdenController {
 
     @Autowired
     private OrdenService ordenService;
 
     @GetMapping
+    @Operation(summary = "Listar ordenes",description = "Obtiene una lista con las ordenes")
     public ResponseEntity<List<Orden>> Listar(){
         List<Orden> ordenes = ordenService.findAll();
         if(ordenes.isEmpty()) {
@@ -28,11 +37,22 @@ public class OrdenController {
     }
 
     @PostMapping
+    @Operation(summary = "Guardar ordenes", description = "Guarda una orden")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Orden guardada exitosamente.",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Orden.class)))
+    })
     public ResponseEntity<Orden> guardar(@RequestBody Orden orden){
         Orden productoNuevo = ordenService.save(orden);
         return ResponseEntity.status(HttpStatus.CREATED).body(productoNuevo);
     }
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar una orden",description = "Obtiene una orden por su codigo.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Orden encontrada exitosamente"),
+            @ApiResponse(responseCode = "404",description = "Orden no encontrada.")
+    })
     public ResponseEntity<Orden> buscar(@PathVariable Long id){
         try {
             Orden orden = ordenService.findById(id);
@@ -43,6 +63,14 @@ public class OrdenController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualizar una orden", description = "Actualiza una ordenn existente.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Orden actualizada correctamente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Orden.class))),
+            @ApiResponse(responseCode = "404", description = "Orden no encontrada.")
+    })
+
     public ResponseEntity<Orden> actualizar(@PathVariable Long id, @RequestBody Orden orden) {
         try {
             Orden or = ordenService.findById(id);
@@ -58,6 +86,11 @@ public class OrdenController {
         }
     }
     @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar una orden", description = "Elimina una orden existente por su codigo.")
+    @ApiResponses (value = {
+            @ApiResponse(responseCode = "200", description = "Orden eliminada exitosamente."),
+            @ApiResponse(responseCode = "404", description = "Orden no encontrada.")
+    })
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
         try {
             ordenService.delete(id);
